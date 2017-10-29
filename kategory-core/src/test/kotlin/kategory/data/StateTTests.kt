@@ -10,15 +10,15 @@ class StateTTests : UnitSpec() {
     val M: StateTMonadStateInstance<TryHK, Int> = StateT.monadState<TryHK, Int>(Try.monad())
 
     val EQ: Eq<StateTKind<TryHK, Int, Int>> = Eq { a, b ->
-        a.runM(1, Try.monad()) == b.runM(1, Try.monad())
+        a.runM(1) == b.runM(1)
     }
 
     val EQ_UNIT: Eq<StateTKind<TryHK, Int, Unit>> = Eq { a, b ->
-        a.runM(1, Try.monad()) == b.runM(1, Try.monad())
+        a.runM(1) == b.runM(1)
     }
 
     val EQ_LIST: Eq<HK<StateTKindPartial<ListKWHK, Int>, Int>> = Eq { a, b ->
-        a.runM(1, ListKW.monad()) == b.runM(1, ListKW.monad())
+        a.runM(1) == b.runM(1)
     }
 
     init {
@@ -37,8 +37,8 @@ class StateTTests : UnitSpec() {
                 StateT.applicative<ListKWHK, Int>(ListKW.monad()),
                 EQ_LIST))
         testLaws(MonadCombineLaws.laws(StateT.monadCombine<ListKWHK, Int>(ListKW.monadCombine()),
-                { StateT.lift(ListKW.pure(it), ListKW.monad()) },
-                { StateT.lift(ListKW.pure({ s: Int -> s * 2 }), ListKW.monad()) },
+                { StateT.lift(ListKW.monad(), ListKW.pure(it)) },
+                { StateT.lift(ListKW.monad(), ListKW.pure({ s: Int -> s * 2 })) },
                 EQ_LIST))
 
     }
