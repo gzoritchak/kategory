@@ -85,7 +85,7 @@ fun push(s: String) = State<Stack, Unit> { stack ->
 The `flatMap` method on `State<S, A>` lets you use the result of one `State` in a subsequent `State`. The updated state (`S`) after the first call is passed into the second call. These `flatMap` and `map` methods allow us to use `State` in for-comprehensions:
 
 ```kotlin:ank:silent
-fun stackOperations() = StateT.monad<IdHK, Stack>().binding {
+fun stackOperations() = State.monad().binding {
     val a = push("a").bind()
     val b = pop().bind()
     val c = pop().bind()
@@ -108,6 +108,40 @@ If we only care about the resulting String and not the final state, then we can 
 
 ```kotlin:ank
 stackOperations().runA(Nel.of("hello", "world", "!").some())
+```
+
+## Simplifying working with State
+
+As we have already seen in some cases working with `State` adds some extra complexity, because it is a wrapper for `(S) -> Tuple2<S, A>` we always have to return a `Tuple2`.
+So in case we want to extract state, set or modify state we can use any of these convenience methods.
+
+```kotlin:ank
+object State {
+    fun <S> get(): StateT<IdHK, S, S> = State { s: S -> s toT s }
+    fun <S, T> inspect(f: (S) -> T): StateT<IdHK, S, T> = State { s: S -> s toT f(s) }
+    fun <S> modify(f: (S) -> S): StateT<IdHK, S, Unit> = State { s: S -> f(s) toT Unit }
+    fun <S> set(s: S): StateT<IdHK, S, Unit> = State { _: S -> s toT Unit }
+}
+```
+
+```kotlin:ank
+fun top(s: String) = State.gets<NelStack, Option<String>> { stack ->
+    stack.fold({
+        none()
+    }, {
+        it.head.some()
+    })
+}
+
+fun push(s: String) = State.modify<NelStack> { stack ->
+    stack.fold({
+        Nel.of(s).some()
+    }, {
+        Nel(s, it.all).some()
+    })
+}
+
+fun replace(stack: NelStack) = State.set(stack)
 ```
 
 Available Instances:

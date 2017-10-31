@@ -16,9 +16,9 @@ object State {
     fun <S> get(): StateT<IdHK, S, S> = State { s: S -> s toT s }
 
     /**
-     * Gets a value from the state with [f] `(S) -> T` without modifying the state.
+     * Inspect a value of the state [S] with [f] `(S) -> T` without modifying the state.
      */
-    fun <S, T> gets(f: (S) -> T): StateT<IdHK, S, T> = State { s: S -> s toT f(s) }
+    fun <S, T> inspect(f: (S) -> T): StateT<IdHK, S, T> = State { s: S -> s toT f(s) }
 
     /**
      * Modify the state with [f] `(S) -> S` and return [Unit].
