@@ -10,6 +10,11 @@ interface Monad<F> : Applicative<F>, Typeclass {
 
     fun <A> flatten(ffa: HK<F, HK<F, A>>): HK<F, A> = flatMap(ffa, { it })
 
+    /**
+     * Keeps calling [f] until [kategory.Either.Right] is returned.
+     *
+     * Based on Phil Freeman's [http://functorial.com/stack-safety-for-free/index.pdf Stack Safety for Free].
+     */
     fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): HK<F, B>
 
     fun <A, B> followedBy(fa: HK<F, A>, fb: HK<F, B>): HK<F, B> = flatMap(fa, { fb })

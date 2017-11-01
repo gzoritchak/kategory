@@ -11,6 +11,11 @@ object State {
     operator fun <S, A> invoke(run: (S) -> Tuple2<S, A>): StateT<IdHK, S, A> = StateT(Id(run.andThen { Id(it) }))
 
     /**
+     * Lift a value of type `A` into `StateT<IdHK, S, A>`.
+     */
+    fun <S, A> lift(a: A): StateT<IdHK, S, A> = StateT.lift(Id.monad(), Id.pure(a))
+
+    /**
      * Return input without modifying it.
      */
     fun <S> get(): StateT<IdHK, S, S> = State { s: S -> s toT s }
