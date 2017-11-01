@@ -15,6 +15,8 @@ class StateT<F, S, A>(
     companion object {
         inline operator fun <reified F, S, A> invoke(noinline run: StateTFun<F, S, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> = StateT(MF.pure(run))
 
+        inline operator fun <reified F, S, A> invoke(MF: Monad<F> = monad<F>(), noinline run: StateTFun<F, S, A>): StateT<F, S, A> = StateT(MF.pure(run))
+
         fun <F, S, A> invokeF(runF: StateTFunKind<F, S, A>): StateT<F, S, A> = StateT(runF)
 
         fun <F, S, A> lift(MF: Monad<F>, fa: HK<F, A>): StateT<F, S, A> = StateT(MF.pure({ s -> MF.map(fa, { a -> Tuple2(s, a) }) }))
